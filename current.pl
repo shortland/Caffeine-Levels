@@ -23,18 +23,14 @@ our $endheaders = qq{
 
 get '/' => sub {
     my $self = shift;
-    #400e^((ln(1/2)/6)*(24))
-    #my $timesince = current unix time - unix time taken;
-    my $timesince = 24;
-    my $dosage = 400;
-    #my $res = $dosage * exp(((log(.5)/21600) * $timesince));
-
     my $amountInSystem = 0;
     my @doses = split(/\|/, read_file("data.txt"));
     for (my $i = 0; $i < scalar(@doses); $i++) {
     	my @diffDatas = split(/\,/, $doses[$i]);
     	my $timesince = time - $diffDatas[1];
-    	$amountInSystem += ($diffDatas[0] * exp(((log(.5)/21600) * $timesince)));
+	my $halfLife = 6; #hours
+	my $halfLifeSeconds = $halfLife * 3600;
+    	$amountInSystem += ($diffDatas[0] * exp(((log(.5)/$halfLifeSeconds) * $timesince)));
     }
     $amountInSystem = nearest(.001, $amountInSystem);
 	$self->render( text => qq{
@@ -73,7 +69,7 @@ post '/' => sub {
 	append_file("data.txt", "$amt,$time|")
 };
  
-app->secrets(['lego1998']);
+app->secrets(['password']);
 app->start;
 
 __DATA__
