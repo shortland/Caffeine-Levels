@@ -1,12 +1,11 @@
 /*
 * Ilan Kleiman
 * script.js
-* 10/22/17
+* 10/23/17
 */
 
-// !!! add supp for the added ones
-
 $(document).ready(function() {
+	var differentTypes;
 
 	var load_it = function() {
 		$.ajax({
@@ -14,12 +13,21 @@ $(document).ready(function() {
 			url: "howmuch?type=all"
 		}).done(function( data ) {
 			var json = JSON.parse(data);
-			$("#Caffeine_current").html( json.["Caffeine"] );
+			for (var i = 0; i < (differentTypes.types).length; i++) {
+				$("#" + differentTypes.types[i] + "_current").html( json[differentTypes.types[i]] );
+			}
 		});
-		
 		setTimeout(load_it, 2000);
 	}
-	load_it();
+
+// starter
+	$.ajax({
+		method: "GET",
+		url: "../types/types.json"
+	}).done(function( data ) {
+		differentTypes = data;
+		load_it();
+	});
 
 	$("button").click(function() {
 		var theType = this.id;
